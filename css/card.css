@@ -1,0 +1,126 @@
+/* ─── CAR GRID ───────────────────────────────── */
+#carList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* ─── CAR CARD ───────────────────────────────── */
+.car-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transition: transform .25s, border-color .25s, box-shadow .25s;
+  position: relative;
+}
+
+.car-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(232,255,71,.25);
+  box-shadow: 0 12px 40px rgba(0,0,0,.4);
+}
+
+.car-card.is-favorite { border-color: rgba(255,107,53,.4); }
+
+.card-img-wrap {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  background: var(--surface2);
+}
+
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s;
+}
+
+.car-card:hover .card-img-wrap img { transform: scale(1.05); }
+
+.fav-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background .2s, transform .2s;
+  z-index: 5;
+}
+
+.fav-badge:hover { transform: scale(1.15); }
+.fav-badge.active { background: rgba(255,107,53,.85); border-color: var(--accent2); }
+
+.card-body { padding: 16px; }
+
+.card-make {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.card-model {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.card-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 12px;
+}
+
+.fav-only-label {
+  font-size: 11px;
+  color: var(--accent2);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.card-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+.card-actions { display: flex; gap: 8px; }
+
+.btn-sm {
+  flex: 1;
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s;
+  letter-spacing: .3px;
+}
+
+.btn-sm:hover { opacity: .85; transform: translateY(-1px); }
+.btn-sm:active { transform: translateY(0); }
+
+.btn-edit    { background: var(--accent); color: #000; }
+.btn-details { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-delete  { background: rgba(255,60,60,.15); color: #ff6b6b; border: 1px solid rgba(255,60,60,.2); }

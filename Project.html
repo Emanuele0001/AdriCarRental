@@ -1,238 +1,285 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoDrive — Car Management</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="project.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AutoDrive — Car Management</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/card.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/toast.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo"><span>AUTO</span>DRIVE</div>
 
-<header>
-  <div class="logo">
-    <span>AUTO</span>DRIVE
-  </div>
+      <div class="header-right">
+        <span id="langStatus">Loading languages…</span>
 
-  <div class="header-right">
-    <span id="langStatus">Loading languages…</span>
+        <div class="lang-wrapper">
+          <select id="langSelect" onchange="applyLanguage()">
+            <option value="en">🌐 English</option>
+            <option value="sq">🇦🇱 Shqip</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="it">🇮🇹 Italiano</option>
+          </select>
+          <span class="lang-arrow">▼</span>
+        </div>
 
-    <div class="lang-wrapper">
-      <select id="langSelect" onchange="applyLanguage()">
-        <option value="en">🌐 English</option>
-        <option value="sq">🇦🇱 Shqip</option>
-        <option value="de">🇩🇪 Deutsch</option>
-        <option value="it">🇮🇹 Italiano</option>
-      </select>
-      <span class="lang-arrow">▼</span>
+        <button
+          class="btn-header-fav"
+          onclick="openFavoritesModal()"
+          title="View Favorites"
+        >
+          ⭐ <span data-i18n="favorites">Favorites</span>
+          <span class="fav-count-badge" id="headerFavCount">0</span>
+        </button>
+
+        <button class="btn-login" onclick="openModal('loginModal')">
+          👤 <span data-i18n="login">Login</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="hero-bar">
+      <h1>YOUR <em>Options</em></h1>
+      <p>Find used vehicles and new vehicles.</p>
     </div>
 
-    <button class="btn-header-fav" onclick="openFavoritesModal()" title="View Favorites">
-      ⭐ <span data-i18n="favorites">Favorites</span>
-      <span class="fav-count-badge" id="headerFavCount">0</span>
-    </button>
+    <div class="main-wrap">
+      <aside class="sidebar">
+        <!-- Kto per krijimin -->
+        <div class="panel">
+          <div class="panel-title">Add Vehicle</div>
 
-    <button class="btn-login" onclick="openModal('loginModal')">
-      👤 <span data-i18n="login">Login</span>
-    </button>
-  </div>
-</header>
+          <div class="field">
+            <label data-i18n="make">Make</label>
+            <input id="make" placeholder="e.g. " />
+          </div>
+          <div class="field">
+            <label data-i18n="model">Model</label>
+            <input id="model" placeholder="e.g. M3" />
+          </div>
+          <div class="field">
+            <label data-i18n="year">Year</label>
+            <input
+              id="year"
+              type="number"
+              placeholder="2023"
+              min="1900"
+              max="2030"
+            />
+          </div>
+          <div class="field">
+            <label data-i18n="price">Price (€)</label>
+            <input id="price" type="number" placeholder="35000" />
+          </div>
+          <div class="field">
+            <label data-i18n="image_url">Image URL</label>
+            <input id="image" placeholder="https://..." />
+          </div>
 
-<div class="hero-bar">
-  <h1>YOUR <em>Options</em></h1>
-  <p>Find used vehicles and new vehicles.</p>
-</div>
+          <button class="btn-save" onclick="createCar()">
+            💾 <span data-i18n="save_vehicle">Save Vehicle</span>
+          </button>
+        </div>
 
-<div class="main-wrap">
+        <!--filtrat nuk e di nqs jane mire ne pamje per te punuar punojne  -->
+        <div class="panel">
+          <div class="panel-title">Filters</div>
 
-  <aside class="sidebar">
+          <div class="range-row">
+            <span data-i18n="min_price">Min Price</span>
+            <span id="minVal" class="range-val">€0</span>
+          </div>
+          <input
+            type="range"
+            id="minPrice"
+            min="0"
+            max="500000"
+            value="0"
+            oninput="displayCars()"
+          />
 
-    <!-- Kto per krijimin -->
-    <div class="panel">
-      <div class="panel-title">Add Vehicle</div>
+          <div class="range-row">
+            <span data-i18n="max_price">Max Price</span>
+            <span id="maxVal" class="range-val">€500,000</span>
+          </div>
+          <input
+            type="range"
+            id="maxPrice"
+            min="0"
+            max="500000"
+            value="500000"
+            oninput="displayCars()"
+          />
+        </div>
+      </aside>
 
-      <div class="field">
-        <label data-i18n="make">Make</label>
-        <input id="make" placeholder="e.g. ">
+      <div>
+        <!-- kto jane statet -->
+        <div class="stats-bar">
+          <div class="stat">
+            <span class="stat-val" id="statTotal">0</span>
+            <span class="stat-label" data-i18n="total_cars">Total Cars</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-val" id="statFavs">0</span>
+            <span class="stat-label" data-i18n="favorites">Favorites</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-val" id="statAvg">—</span>
+            <span class="stat-label" data-i18n="avg_price">Avg Price</span>
+          </div>
+        </div>
+
+        <div class="tab-strip">
+          <button
+            class="tab-btn active"
+            onclick="switchTab('all', this)"
+            data-i18n="all_cars"
+          >
+            All Cars
+          </button>
+          <button class="tab-btn" onclick="switchTab('fav', this)">
+            ⭐ <span data-i18n="favorites_tab">Favorites</span>
+          </button>
+        </div>
+
+        <div class="controls-row">
+          <div class="search-box">
+            <span class="search-icon"></span>
+            <input
+              id="search"
+              placeholder="Search make or model…"
+              oninput="displayCars()"
+            />
+          </div>
+          <select id="sort" class="sort-select" onchange="displayCars()">
+            <option value="" data-i18n="sort_default">Sort</option>
+            <option value="high" data-i18n="sort_high">
+              Price: High → Low
+            </option>
+            <option value="low" data-i18n="sort_low">Price: Low → High</option>
+            <option value="newest">Year: Newest First</option>
+          </select>
+        </div>
+
+        <div id="carList"></div>
       </div>
-      <div class="field">
-        <label data-i18n="model">Model</label>
-        <input id="model" placeholder="e.g. M3">
-      </div>
-      <div class="field">
-        <label data-i18n="year">Year</label>
-        <input id="year" type="number" placeholder="2023" min="1900" max="2030">
-      </div>
-      <div class="field">
-        <label data-i18n="price">Price (€)</label>
-        <input id="price" type="number" placeholder="35000">
-      </div>
-      <div class="field">
-        <label data-i18n="image_url">Image URL</label>
-        <input id="image" placeholder="https://...">
-      </div>
+    </div>
+    <!-- keto ikonat e yllit te celsit duhen nderruar i bera keshtu se sdija ndonje faqe per ikonat -->
+    <div class="modal-overlay" id="loginModal">
+      <div class="modal-box modal-sm">
+        <button class="modal-close" onclick="closeModal('loginModal')">
+          ✕
+        </button>
+        <div class="modal-title">SIGN <em>IN</em></div>
 
-      <button class="btn-save" onclick="createCar()">
-        💾 <span data-i18n="save_vehicle">Save Vehicle</span>
-      </button>
+        <div id="loginView">
+          <div class="field">
+            <label>Email</label>
+            <input id="login-email" type="email" placeholder="you@email.com" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="login-pass" type="password" placeholder="••••••••" />
+          </div>
+          <button class="btn-save" onclick="doLogin()">🔑 Login</button>
+          <p class="modal-switch">
+            No account? <a href="#" onclick="showRegister()">Register</a>
+          </p>
+        </div>
+
+        <div id="registerView" style="display: none">
+          <div class="field">
+            <label>Name</label>
+            <input id="reg-name" placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input id="reg-email" type="email" placeholder="you@email.com" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="reg-pass" type="password" placeholder="••••••••" />
+          </div>
+          <button class="btn-save" onclick="doRegister()">
+            Create Account
+          </button>
+          <p class="modal-switch">
+            Already have an account? <a href="#" onclick="showLogin()">Login</a>
+          </p>
+        </div>
+      </div>
     </div>
 
-    <!--filtrat nuk e di nqs jane mire ne pamje per te punuar punojne  -->
-    <div class="panel">
-      <div class="panel-title">Filters</div>
-
-      <div class="range-row">
-        <span data-i18n="min_price">Min Price</span>
-        <span id="minVal" class="range-val">€0</span>
-      </div>
-      <input type="range" id="minPrice" min="0" max="500000" value="0" oninput="displayCars()">
-
-      <div class="range-row">
-        <span data-i18n="max_price">Max Price</span>
-        <span id="maxVal" class="range-val">€500,000</span>
-      </div>
-      <input type="range" id="maxPrice" min="0" max="500000" value="500000" oninput="displayCars()">
-    </div>
-
-  </aside>
-
-  <div>
-
-    <!-- kto jane statet -->
-    <div class="stats-bar">
-      <div class="stat">
-        <span class="stat-val" id="statTotal">0</span>
-        <span class="stat-label" data-i18n="total_cars">Total Cars</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <span class="stat-val" id="statFavs">0</span>
-        <span class="stat-label" data-i18n="favorites">Favorites</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <span class="stat-val" id="statAvg">—</span>
-        <span class="stat-label" data-i18n="avg_price">Avg Price</span>
+    <div class="modal-overlay" id="favoritesModal">
+      <div class="modal-box modal-wide">
+        <button class="modal-close" onclick="closeModal('favoritesModal')">
+          ✕
+        </button>
+        <div class="modal-title">MY <em>FAVORITES</em></div>
+        <div id="favoritesContent"></div>
       </div>
     </div>
 
-    <div class="tab-strip">
-      <button class="tab-btn active" onclick="switchTab('all', this)" data-i18n="all_cars">All Cars</button>
-      <button class="tab-btn" onclick="switchTab('fav', this)">
-        ⭐ <span data-i18n="favorites_tab">Favorites</span>
-      </button>
-    </div>
+    <div class="modal-overlay" id="editModal">
+      <div class="modal-box modal-sm">
+        <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+        <div class="modal-title">EDIT <em>VEHICLE</em></div>
 
-    <div class="controls-row">
-      <div class="search-box">
-        <span class="search-icon"></span>
-        <input id="search" placeholder="Search make or model…" oninput="displayCars()">
+        <div class="field">
+          <label>Make</label>
+          <input id="edit-make" placeholder="Make" />
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input id="edit-model" placeholder="Model" />
+        </div>
+        <div class="field">
+          <label>Year</label>
+          <input id="edit-year" type="number" placeholder="Year" />
+        </div>
+        <div class="field">
+          <label>Price (€)</label>
+          <input id="edit-price" type="number" placeholder="Price" />
+        </div>
+        <div class="field">
+          <label>Image URL</label>
+          <input id="edit-image" placeholder="https://..." />
+        </div>
+
+        <button class="btn-save" onclick="saveEdit()">✔ Update Vehicle</button>
       </div>
-      <select id="sort" class="sort-select" onchange="displayCars()">
-        <option value="" data-i18n="sort_default">Sort</option>
-        <option value="high" data-i18n="sort_high">Price: High → Low</option>
-        <option value="low" data-i18n="sort_low">Price: Low → High</option>
-        <option value="newest">Year: Newest First</option>
-      </select>
     </div>
 
-    <div id="carList"></div>
-
-  </div>
-</div>
-<!-- keto ikonat e yllit te celsit duhen nderruar i bera keshtu se sdija ndonje faqe per ikonat -->
-<div class="modal-overlay" id="loginModal">
-  <div class="modal-box modal-sm">
-    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
-    <div class="modal-title">SIGN <em>IN</em></div>
-
-
-
-    <div id="loginView">
-      <div class="field">
-        <label>Email</label>
-        <input id="login-email" type="email" placeholder="you@email.com">
+    <div class="modal-overlay" id="detailsModal">
+      <div class="modal-box modal-sm">
+        <button class="modal-close" onclick="closeModal('detailsModal')">
+          ✕
+        </button>
+        <div class="modal-title" id="detailsTitle">CAR <em>DETAILS</em></div>
+        <div id="detailsContent"></div>
       </div>
-      <div class="field">
-        <label>Password</label>
-        <input id="login-pass" type="password" placeholder="••••••••">
-      </div>
-      <button class="btn-save" onclick="doLogin()">🔑 Login</button>
-      <p class="modal-switch">No account? <a href="#" onclick="showRegister()">Register</a></p>
     </div>
 
+    <div class="toast-container" id="toastContainer"></div>
 
-    <div id="registerView" style="display:none">
-      <div class="field">
-        <label>Name</label>
-        <input id="reg-name" placeholder="Your name">
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input id="reg-email" type="email" placeholder="you@email.com">
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input id="reg-pass" type="password" placeholder="••••••••">
-      </div>
-      <button class="btn-save" onclick="doRegister()"> Create Account</button>
-      <p class="modal-switch">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="modal-overlay" id="favoritesModal">
-  <div class="modal-box modal-wide">
-    <button class="modal-close" onclick="closeModal('favoritesModal')">✕</button>
-    <div class="modal-title">MY <em>FAVORITES</em></div>
-    <div id="favoritesContent"></div>
-  </div>
-</div>
-
-
-<div class="modal-overlay" id="editModal">
-  <div class="modal-box modal-sm">
-    <button class="modal-close" onclick="closeModal('editModal')">✕</button>
-    <div class="modal-title">EDIT <em>VEHICLE</em></div>
-
-    <div class="field">
-      <label>Make</label>
-      <input id="edit-make" placeholder="Make">
-    </div>
-    <div class="field">
-      <label>Model</label>
-      <input id="edit-model" placeholder="Model">
-    </div>
-    <div class="field">
-      <label>Year</label>
-      <input id="edit-year" type="number" placeholder="Year">
-    </div>
-    <div class="field">
-      <label>Price (€)</label>
-      <input id="edit-price" type="number" placeholder="Price">
-    </div>
-    <div class="field">
-      <label>Image URL</label>
-      <input id="edit-image" placeholder="https://...">
-    </div>
-
-    <button class="btn-save" onclick="saveEdit()">✔ Update Vehicle</button>
-  </div>
-</div>
-
-
-<div class="modal-overlay" id="detailsModal">
-  <div class="modal-box modal-sm">
-    <button class="modal-close" onclick="closeModal('detailsModal')">✕</button>
-    <div class="modal-title" id="detailsTitle">CAR <em>DETAILS</em></div>
-    <div id="detailsContent"></div>
-  </div>
-</div>
-
-<div class="toast-container" id="toastContainer"></div>
-
-<script src="project.js"></script>
-</body>
+    <script src="js/state.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/crud.js"></script>
+    <script src="js/app.js"></script>
+  </body>
 </html>
