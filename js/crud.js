@@ -67,14 +67,16 @@ function saveEdit()
   showToast(`✏️ ${make} ${model} updated`);
 }
 
-function deleteCar(id) 
+function deleteCar(id)
 {
-  
+
   const car = cars.find(c => c.id === id);
   cars      = cars.filter(c => c.id !== id);
   favorites = favorites.filter(f => f !== id);
+  bookings  = bookings.filter(b => b.carId !== id);
   localStorage.setItem("cars",      JSON.stringify(cars));
   localStorage.setItem("favorites", JSON.stringify(favorites));
+  localStorage.setItem("bookings",  JSON.stringify(bookings));
   displayCars();
   showToast(`🗑 ${car ? car.make + ' ' + car.model : 'Car'} removed`);
 }
@@ -87,27 +89,6 @@ function toggleFavorite(id)
   displayCars();
   updateFavBadge();
   showToast(wasFav ? '💔 Removed from favorites' : '⭐ Added to favorites');
-}
-
-function showDetails(id) 
-{
-  const car = cars.find(c => c.id === id);
-  if (!car) return;
-
-  document.getElementById('detailsContent').innerHTML = `
-    <img class="details-img" src="${car.image}"
-      onerror="this.src='https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&q=80'">
-    <div class="detail-row"><span class="dk">Make</span><span class="dv">${car.make}</span></div>
-    <div class="detail-row"><span class="dk">Model</span><span class="dv">${car.model}</span></div>
-    <div class="detail-row"><span class="dk">Year</span><span class="dv">${car.year}</span></div>
-    <div class="detail-row"><span class="dk">Price</span>
-      <span class="dv detail-price">€${Number(car.price).toLocaleString()}</span></div>
-    <div class="detail-row"><span class="dk">Status</span>
-      <span class="dv">${favorites.includes(car.id) ? '⭐ Favorite' : 'Not favorited'}</span></div>
-  `;
-
-  document.getElementById('detailsTitle').innerHTML = `${car.make} <em>${car.model}</em>`;
-  openModal('detailsModal');
 }
 
 // ─── FAVORITES MODAL ────────────────────────────────────────────────────
