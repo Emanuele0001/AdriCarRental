@@ -66,6 +66,12 @@ function updateLoginBtn() {
     addPanel.style.display = isAdmin ? "block" : "none";
   }
 
+  // Toggle Bookings button (admin only)
+  const bookingsBtn = document.getElementById("btn-all-bookings");
+  if (bookingsBtn) {
+    bookingsBtn.style.display = isAdmin ? "inline-flex" : "none";
+  }
+
   // Re-render cars to hide/show edit/delete buttons based on the user
   if (typeof displayCars === "function") {
     displayCars();

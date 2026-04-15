@@ -1,6 +1,7 @@
 let cars = JSON.parse(localStorage.getItem("cars")) || [];
 let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 let users = JSON.parse(localStorage.getItem("users")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 
 // Seed default admin user
 if (!users.find((u) => u.email === "admin@admin.com")) {

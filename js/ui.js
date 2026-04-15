@@ -52,12 +52,14 @@ function displayCars() {
   }
 
   const isAdmin = currentUser && currentUser.role === "ROLE_ADMIN";
+  const isUser = currentUser && currentUser.role === "ROLE_USER";
 
   list.innerHTML = filtered
     .map((car) => {
       const isFav = favorites.includes(car.id);
+      const isBooked = bookings.find(b => b.carId === car.id);
       return `
-      <div class="car-card ${isFav ? "is-favorite" : ""}">
+      <div class="car-card ${isFav ? "is-favorite" : ""} ${isBooked ? "is-booked" : ""}">
         <div class="card-img-wrap">
           <img src="${car.image}"
             onerror="this.src='https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&q=80'"
@@ -67,19 +69,28 @@ function displayCars() {
             title="${isFav ? "Remove favorite" : "Add to favorites"}">
             ${isFav ? "⭐" : "☆"}
           </button>
+          ${isBooked ? '<span class="booked-ribbon">BOOKED</span>' : ""}
         </div>
         <div class="card-body">
-          <div class="card-make">${car.make}</div>
-          <div class="card-model">${car.model}</div>
-          <div class="card-meta">
-            <span>📅 ${car.year}</span>
-            ${isFav ? '<span class="fav-only-label">★ FAV</span>' : ""}
+          <div class="card-header-row">
+            <span class="card-make">${car.make}</span>
+            <span class="card-year">📅 ${car.year}</span>
           </div>
+          <div class="card-model">${car.model}</div>
           <div class="card-price">€${Number(car.price).toLocaleString()}</div>
+          <div class="card-tags">
+            ${isBooked
+              ? '<span class="tag tag-booked">🔒 Booked</span>'
+              : '<span class="tag tag-available">✓ Available</span>'}
+            ${isFav ? '<span class="tag tag-fav">⭐ Favorite</span>' : ""}
+          </div>
           <div class="card-actions">
-            ${isAdmin ? `<button class="btn-sm btn-edit"    onclick="editCar(${car.id})">✏ Edit</button>` : ""}
-            <button class="btn-sm btn-details" onclick="showDetails(${car.id})">🔍 Details</button>
-            ${isAdmin ? `<button class="btn-sm btn-delete"  onclick="deleteCar(${car.id})">🗑</button>` : ""}
+            ${isAdmin ? `<button class="btn-sm btn-edit" onclick="editCar(${car.id})">✏ Edit</button>` : ""}
+            ${isAdmin ? `<button class="btn-sm btn-delete" onclick="deleteCar(${car.id})">🗑</button>` : ""}
+            ${isUser ? (isBooked
+              ? `<button class="btn-sm btn-booked" disabled>🔒 Booked</button>`
+              : `<button class="btn-sm btn-book" onclick="openBookingModal(${car.id})">📅 Book</button>`
+            ) : ""}
           </div>
         </div>
       </div>`;
