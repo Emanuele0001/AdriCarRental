@@ -10,8 +10,7 @@ function openBookingModal(carId) {
   const car = cars.find(c => c.id === carId);
   if (!car) return;
 
-  const isBooked = bookings.find(b => b.carId === carId);
-  if (isBooked) {
+  if (car.isBooked) {
     showToast("⚠ This car is already booked", true);
     return;
   }
@@ -24,71 +23,68 @@ function openBookingModal(carId) {
   openModal("bookingModal");
 }
 
-function confirmBooking() {
+async function confirmBooking() {
   const start = document.getElementById("booking-start").value;
-  const end = document.getElementById("booking-end").value;
+  const end   = document.getElementById("booking-end").value;
 
-  if (!start || !end) {
-    showToast("⚠ Please select start and end dates", true);
-    return;
-  }
-  if (start >= end) {
-    showToast("⚠ End date must be after start date", true);
-    return;
-  }
+  if (!start || !end) { showToast("⚠ Please select start and end dates", true); return; }
+  if (start >= end)   { showToast("⚠ End date must be after start date", true); return; }
 
   const car = cars.find(c => c.id === bookingCarId);
   if (!car) return;
 
-  bookings.push({
-    id: Date.now(),
-    carId: bookingCarId,
-    carName: `${car.make} ${car.model}`,
-    userName: currentUser.name,
-    userEmail: currentUser.email,
-    startDate: start,
-    endDate: end
-  });
-
-  localStorage.setItem("bookings", JSON.stringify(bookings));
-  closeModal("bookingModal");
-  bookingCarId = null;
-  displayCars();
-  showToast(`✅ ${car.make} ${car.model} booked successfully!`);
+  try {
+    const booking = await apiFetch("/bookings", {
+      method: "POST",
+      body: JSON.stringify({ carId: bookingCarId, startDate: start, endDate: end })
+    });
+    bookings.push(booking);
+    cars = cars.map(c => c.id === bookingCarId ? { ...c, isBooked: true } : c);
+    closeModal("bookingModal");
+    bookingCarId = null;
+    displayCars();
+    showToast(`✅ ${car.make} ${car.model} booked successfully!`);
+  } catch (e) {
+    showToast(`❌ ${e.message}`, true);
+  }
 }
 
-function openBookingsModal() {
-  if (bookings.length === 0) {
-    document.getElementById("bookingsContent").innerHTML = `
-      <div class="empty-state" style="padding:40px 0">
-        <div class="empty-icon">📋</div>
-        <h3>No Bookings Yet</h3>
-        <p>No cars have been booked.</p>
-      </div>`;
-  } else {
-    document.getElementById("bookingsContent").innerHTML = `
-      <table class="bookings-table">
-        <thead>
-          <tr>
-            <th>Car</th>
-            <th>User</th>
-            <th>Email</th>
-            <th>From</th>
-            <th>To</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${bookings.map(b => `
+async function openBookingsModal() {
+  try {
+    const data = await apiFetch("/bookings");
+    bookings = data;
+
+    if (bookings.length === 0) {
+      document.getElementById("bookingsContent").innerHTML = `
+        <div class="empty-state" style="padding:40px 0">
+          <div class="empty-icon">📋</div>
+          <h3>No Bookings Yet</h3>
+          <p>No cars have been booked.</p>
+        </div>`;
+    } else {
+      document.getElementById("bookingsContent").innerHTML = `
+        <table class="bookings-table">
+          <thead>
             <tr>
-              <td>${b.carName}</td>
-              <td>${b.userName}</td>
-              <td>${b.userEmail}</td>
-              <td>${b.startDate}</td>
-              <td>${b.endDate}</td>
+              <th>Car</th><th>User</th><th>Email</th><th>From</th><th>To</th>
             </tr>
-          `).join("")}
-        </tbody>
-      </table>`;
+          </thead>
+          <tbody>
+            ${bookings.map(b => `
+              <tr>
+                <td>${b.carName}</td>
+                <td>${b.userName}</td>
+                <td>${b.userEmail}</td>
+                <td>${b.startDate ? b.startDate.split("T")[0] : ""}</td>
+                <td>${b.endDate   ? b.endDate.split("T")[0]   : ""}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`;
+    }
+  } catch (e) {
+    document.getElementById("bookingsContent").innerHTML = `<p>Failed to load bookings.</p>`;
   }
+
   openModal("bookingsModal");
 }

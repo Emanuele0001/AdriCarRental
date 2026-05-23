@@ -1,3 +1,3 @@
-displayCars();
 updateLoginBtn();
 loadLanguages();
+loadCars();

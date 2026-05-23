@@ -1,0 +1,15 @@
+# Environment secrets
+.env
+
+# .NET build output
+backend/bin/
+backend/obj/
+
+# EF Core migrations snapshots (optional — remove if you want to commit migrations)
+# backend/Migrations/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/

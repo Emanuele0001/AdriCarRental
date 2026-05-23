@@ -18,7 +18,7 @@ function displayCars() {
       c.model.toLowerCase().includes(search);
     const p = Number(c.price);
     const matchPrice = p >= min && p <= max;
-    const matchTab = activeTab === "all" || favorites.includes(c.id);
+    const matchTab = activeTab === "all" || c.isFavorite;
     return matchSearch && matchPrice && matchTab;
   });
 
@@ -56,8 +56,8 @@ function displayCars() {
 
   list.innerHTML = filtered
     .map((car) => {
-      const isFav = favorites.includes(car.id);
-      const isBooked = bookings.find(b => b.carId === car.id);
+      const isFav = car.isFavorite;
+      const isBooked = car.isBooked;
       return `
       <div class="car-card ${isFav ? "is-favorite" : ""} ${isBooked ? "is-booked" : ""}">
         <div class="card-img-wrap">
