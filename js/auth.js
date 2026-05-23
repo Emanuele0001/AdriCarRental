@@ -1,81 +1,76 @@
-//kjo a per nje future auth..  po su desh e lejme heqim  por pash qe gr. e tjera e kishin ber
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById("login-email").value.trim();
   const pass = document.getElementById("login-pass").value.trim();
 
-  if (!email || !pass) {
-    showToast("⚠ Fill in email and password", true);
-    return;
-  }
+  if (!email || !pass) { showToast("⚠ Fill in email and password", true); return; }
 
-  const user = users.find((u) => u.email === email && u.password === pass);
-  if (!user) {
-    showToast("❌ invalid email or password", true);
-    return;
+  try {
+    const data = await apiFetch("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password: pass })
+    });
+    _setSession(data);
+    closeModal("loginModal");
+    updateLoginBtn();
+    showToast(`👋 Welcome back!, ${data.name}!`);
+    await loadCars();
+  } catch (e) {
+    showToast(`❌ ${e.message}`, true);
   }
-
-  currentUser = {
-    name: user.name,
-    email: user.email,
-    role: user.role || "ROLE_USER",
-  };
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-  closeModal("loginModal");
-  updateLoginBtn();
-  showToast(`👋 Welcome back!, ${user.name}!`);
 }
 
-function doRegister() {
+async function doRegister() {
   const name = document.getElementById("reg-name").value.trim();
   const email = document.getElementById("reg-email").value.trim();
   const pass = document.getElementById("reg-pass").value.trim();
 
-  if (!name || !email || !pass) {
-    showToast("⚠ Fill all fields", true);
-    return;
-  }
-  if (users.find((u) => u.email === email)) {
-    showToast("⚠ Email already registered", true);
-    return;
-  }
+  if (!name || !email || !pass) { showToast("⚠ Fill all fields", true); return; }
 
-  users.push({ name, email, password: pass, role: "ROLE_USER" });
-  localStorage.setItem("users", JSON.stringify(users));
-
-  currentUser = { name, email, role: "ROLE_USER" };
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-  closeModal("loginModal");
-  updateLoginBtn();
-  showToast(`🎉 Account created! Welcome, ${name}!`);
+  try {
+    const data = await apiFetch("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ name, email, password: pass })
+    });
+    _setSession(data);
+    closeModal("loginModal");
+    updateLoginBtn();
+    showToast(`🎉 Account created! Welcome, ${name}!`);
+    await loadCars();
+  } catch (e) {
+    showToast(`❌ ${e.message}`, true);
+  }
 }
 
 function doLogout() {
   currentUser = null;
+  token = null;
   localStorage.removeItem("currentUser");
+  localStorage.removeItem("token");
+  favorites = [];
+  bookings = [];
   updateLoginBtn();
+  displayCars();
   showToast("👋 Logged out");
+}
+
+function _setSession(data) {
+  token = data.token;
+  currentUser = { name: data.name, email: data.email, role: data.role };
+  localStorage.setItem("token", token);
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
 }
 
 function updateLoginBtn() {
   const btn = document.querySelector(".btn-login");
 
-  // Toggle Admin Panel Visibility
   const isAdmin = currentUser && currentUser.role === "ROLE_ADMIN";
   const addPanel = document.getElementById("addVehiclePanel");
-  if (addPanel) {
-    addPanel.style.display = isAdmin ? "block" : "none";
-  }
+  if (addPanel) addPanel.style.display = isAdmin ? "block" : "none";
 
-  // Toggle Bookings button (admin only)
   const bookingsBtn = document.getElementById("btn-all-bookings");
-  if (bookingsBtn) {
-    bookingsBtn.style.display = isAdmin ? "inline-flex" : "none";
-  }
+  if (bookingsBtn) bookingsBtn.style.display = isAdmin ? "inline-flex" : "none";
 
-  // Re-render cars to hide/show edit/delete buttons based on the user
-  if (typeof displayCars === "function") {
-    displayCars();
-  }
+  if (typeof displayCars === "function") displayCars();
 
   if (currentUser) {
     btn.innerHTML = `

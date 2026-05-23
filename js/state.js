@@ -1,20 +1,26 @@
-let cars = JSON.parse(localStorage.getItem("cars")) || [];
-let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+const API_BASE = "/api";
 
-// Seed default admin user
-if (!users.find((u) => u.email === "admin@admin.com")) {
-  users.push({
-    name: "Admin",
-    email: "admin@admin.com",
-    password: "admin",
-    role: "ROLE_ADMIN",
-  });
-  localStorage.setItem("users", JSON.stringify(users));
-}
+let cars = [];
+let favorites = [];
+let bookings = [];
 
 let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
+let token = localStorage.getItem("token") || null;
 
 let editId = null;
 let activeTab = "all";
+
+function authHeaders() {
+  return token ? { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+}
+
+async function apiFetch(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: { ...authHeaders(), ...(options.headers || {}) }
+  });
+  if (res.status === 204) return null;
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.message || `Request failed (${res.status})`);
+  return data;
+}
