@@ -7,55 +7,40 @@ http://127.0.0.1:5000 frontend
 ## Requirements
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [PostgreSQL](https://www.postgresql.org/download/) (running locally on port 5432)
+- [PostgreSQL](https://www.postgresql.org/download/) running on port 5432
 
-## 1. Configure the database connection
+## Setup
 
-Edit `backend/appsettings.json` and update the connection string with your PostgreSQL credentials:
+**1. Copy the env file and fill in your PostgreSQL password:**
+```
+cp .env.example .env
+```
+Edit `.env` and set your password in `ConnectionStrings__DefaultConnection`.
 
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Port=5432;Database=AdriCarRental;Username=postgres;Password=yourpassword"
-}
+**2. Run the backend (from the repo root):**
+```
+dotnet run --project backend
 ```
 
-## 2. Install .NET tools and restore packages
+The database and tables are created automatically on first run.
 
-```bash
-cd backend
-dotnet restore
+**3. Open the app:**
+```
+http://127.0.0.1:5000
 ```
 
-## 3. Install EF Core tools (once per machine)
+## Default admin account
 
-```bash
-dotnet tool install --global dotnet-ef
-```
-
-## 4. Create and apply the database migration
-
-```bash
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-```
-
-> The database is also auto-migrated on startup, so `dotnet ef database update` is optional after the first run.
-
-## 5. Run the API
-
-```bash
-dotnet run
-```
-
-The API starts at **http://localhost:5000**.
+- Email: `admin@admin.com`
+- Password: `admin`
 
 ## API Endpoints
 
 | Method | URL | Auth | Description |
 |--------|-----|------|-------------|
-| POST | /api/auth/login | — | Login, returns JWT |
-| POST | /api/auth/register | — | Register, returns JWT |
-| GET | /api/cars | optional | List all cars |
+| POST | /api/auth/login | — | Login |
+| POST | /api/auth/register | — | Register |
+| GET | /api/cars | — | List all cars |
 | POST | /api/cars | Admin | Add a car |
 | PUT | /api/cars/{id} | Admin | Edit a car |
 | DELETE | /api/cars/{id} | Admin | Delete a car |
@@ -71,7 +56,3 @@ The API starts at **http://localhost:5000**.
 - Email: `admin@admin.com`
 - Password: `admin`
 
-## Frontend
-
-Open `Project.html` directly in a browser (or serve it via Live Server in VS Code).  
-The frontend calls `http://localhost:5000/api` — make sure the backend is running first.
